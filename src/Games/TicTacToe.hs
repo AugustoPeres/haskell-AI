@@ -61,7 +61,9 @@ instance AdversarialGame TicTacToe Action Player where
           else mark
   availableActions (TicTacToe b _) = [i | (i, Nothing) <- zip [0 .. 8] b]
   currentPlayer = player
-  isFinal game = any (\x -> isWinningCombination x (board game)) [X, O]
+  isFinal game =
+    or [any (\x -> isWinningCombination x (board game)) [X, O],
+        availableActions game == []]
   winner (TicTacToe b _) =
     if isWinningCombination X b
       then Just X

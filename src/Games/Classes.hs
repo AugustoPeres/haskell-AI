@@ -8,8 +8,8 @@ module Games.Classes
   , currentPlayer
   , getRandomAction
   , playRandomAction
-  , -- , playRandomGame
-    winner
+  , playRandomGame
+  , winner
   ) where
 
 import           Control.Monad.State (State, get, put)
@@ -43,9 +43,14 @@ class (Eq p) =>
                Nothing     -> return game
                Just action -> return $ step game action)
   playRandomGame :: g -> State StdGen g
-  playRandomGame game = do
-    if isFinal game
-      then return game
-      else do
-        newGame <- playRandomAction game
-        playRandomGame newGame
+  playRandomGame game =
+    playRandomAction game >>=
+    (\g ->
+       case isFinal g of
+         True -> return g
+         _    -> playRandomGame g)
+--     if isFinal game
+--       then return game
+--       else do
+--         newGame <- playRandomAction game
+--         playRandomGame newGame
