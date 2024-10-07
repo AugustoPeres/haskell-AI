@@ -1,8 +1,17 @@
 module AI.Tree
-  ( Tree
-  )
+  ( Tree(..)
+  , Zipper
+  , makeZipper
+  , followDirection
+  , getRootValue
+  , goUpWith
+  , goToTopWith
+  , followToBottomWith
+  ) where
 
 import           Utils.Utils      (firstElem, maxValuesBy, choice)
+import           Control.Monad.State (State, get, put)
+import           System.Random       (StdGen)
 
   
 data Tree crumb value = Leaf value | Node value [(crumb, Tree crumb value)] deriving (Eq, Show, Ord)
@@ -26,3 +35,24 @@ followDirection (Node val children, c) crumb =
   case firstElem (\(c', _) -> c' == crumb) children of
     Nothing           -> error "nothing follows this crumb"
     Just (_, subTree) -> (subTree, Crumb val crumb (filter (\(c', _) -> c' /= crumb) children) : c) 
+
+goUpWith :: Zipper crumb value -> (value -> value -> value) -> Zipper crumb value
+goUpWith z@(_, []) _ = z
+goUpWith (tree, (Crumb value crum children):xs) f =
+  (Node resultingValue ((crum, tree):children), xs) 
+  where resultingValue = f (getRootValue tree ) value 
+
+goToTopWith :: Zipper crumb value -> (value -> value -> value) -> Zipper crumb value
+goToTopWith z@(_, []) _ = z
+goToTopWith z f         = goToTopWith (goUpWith z f) f
+
+followToBottomWith :: (Eq crumb, Ord b) => Zipper crumb value -> (value -> value -> b) -> State StdGen (Zipper crumb value)
+followToBottomWith (l@(Leaf _), c) _ = return (l, c)
+followToBottomWith z@(Node v children, _) f =
+  get >>= (\gen ->
+             let (g', direction) = choice (map fst $ maxValuesBy children ((f v) . getRootValue . snd)) gen
+             in put g' >> followToBottomWith (followDirection z direction) f)
+
+getRootValue :: Tree crumb value -> value
+getRootValue (Leaf v)   = v
+getRootValue (Node v _) = v
