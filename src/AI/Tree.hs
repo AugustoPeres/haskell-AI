@@ -7,6 +7,8 @@ module AI.Tree
   , goUpWith
   , goToTopWith
   , followToBottomWith
+  , addChildren
+  , updateRootValue
   ) where
 
 import           Utils.Utils      (firstElem, maxValuesBy, choice)
@@ -46,13 +48,24 @@ goToTopWith :: Zipper crumb value -> (value -> value -> value) -> Zipper crumb v
 goToTopWith z@(_, []) _ = z
 goToTopWith z f         = goToTopWith (goUpWith z f) f
 
+addChildren :: Zipper crumb value -> [(crumb, value)] -> Zipper crumb value
+addChildren z [] = z
+addChildren ((Leaf value), c) newChildren = (Node value [(crumb, Leaf v) | (crumb, v) <- newChildren], c)
+addChildren ((Node value children), c) newChildren = (Node value (children ++ [(crumb, Leaf v) | (crumb, v) <- newChildren]), c)
+
 followToBottomWith :: (Eq crumb, Ord b) => Zipper crumb value -> (value -> value -> b) -> State StdGen (Zipper crumb value)
 followToBottomWith (l@(Leaf _), c) _ = return (l, c)
 followToBottomWith z@(Node v children, _) f =
   get >>= (\gen ->
-             let (g', direction) = choice (map fst $ maxValuesBy children ((f v) . getRootValue . snd)) gen
+             let maxChildren = maxValuesBy children ((f v) . getRootValue . snd)
+                 (g', direction) = choice (map fst maxChildren) gen
              in put g' >> followToBottomWith (followDirection z direction) f)
 
 getRootValue :: Tree crumb value -> value
 getRootValue (Leaf v)   = v
 getRootValue (Node v _) = v
+
+
+updateRootValue :: Tree crumb value -> value -> Tree crumb value
+updateRootValue (Leaf _) v  = Leaf v
+updateRootValue (Node _ c) v = Node v c
