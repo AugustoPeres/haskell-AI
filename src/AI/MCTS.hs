@@ -39,8 +39,8 @@ import Utils.Utils (choice, maxValuesBy)
 type MCTSNode g = (g, Int, Int) -- (current game state, wins, victories)
 
 data MCTSAgent g a p =
-  MCTSAgent { zipper :: Zipper a (MCTSNode g)
-            , player :: p
+  MCTSAgent { zipper         :: Zipper a (MCTSNode g)
+            , player         :: p
             , numSimulations :: Int } deriving (Show)
 
 
