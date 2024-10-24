@@ -62,6 +62,7 @@ library
       MyLib
       Games.Classes
       Games.TicTacToe
+      Games.ConnectFour
       Utils.Utils
       AI.Tree
       AI.MCTS

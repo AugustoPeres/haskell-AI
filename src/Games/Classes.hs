@@ -49,8 +49,3 @@ class (Eq p) =>
        case isFinal g of
          True -> return g
          _    -> playRandomGame g)
---     if isFinal game
---       then return game
---       else do
---         newGame <- playRandomAction game
---         playRandomGame newGame
