@@ -101,6 +101,9 @@ executable haskell-AI
     build-depends:
         base ^>=4.17.2.1,
         haskell-AI,
+        monad-loops,
+        random,
+        mtl
 
     -- Directories containing source files.
     hs-source-dirs:   app

@@ -49,7 +49,7 @@ takeAction gameState numIterations =
   get >>= (\gen ->
           let agent = MCTSAgent { zipper = makeZipper (makeTree (gameState, 0, 0)),
                                   player = currentPlayer gameState,
-                                  numSimulations = 10 }
+                                  numSimulations = 100 } -- TODO(augusto): Remove hard coded simulations
               iteratedAgent = foldM (\ag _ -> mctsIteration ag) agent [1..numIterations]
               (agent', newGen) = runState iteratedAgent gen
               (tree, _) = zipper agent'
