@@ -36,7 +36,7 @@ import           AI.Tree             (followToBottomWith, Zipper, getRootValue, 
 import           Games.Classes
 import Utils.Utils (choice, maxValuesBy)
 
-type MCTSNode g = (g, Int, Int) -- (current game state, wins, victories)
+type MCTSNode g = (g, Int, Int) -- (current game state, wins, n simulations)
 
 data MCTSAgent g a p =
   MCTSAgent { zipper         :: Zipper a (MCTSNode g)
