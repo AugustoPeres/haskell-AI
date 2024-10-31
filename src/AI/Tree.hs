@@ -20,11 +20,6 @@ import           System.Random       (StdGen)
   
 data Tree crumb value = Leaf value | Node value [(crumb, Tree crumb value)] deriving (Eq, Show, Ord)
 
-instance Functor (Tree crumb) where
-  fmap f (Leaf value)          = Leaf (f value)
-  fmap f (Node value children) = Node (f value) [(crumb, fmap f t) | (crumb, t) <- children]
-
-
 data Crumb crumb value = Crumb value crumb [(crumb, Tree crumb value)] deriving (Eq, Show, Ord)
 
 type Zipper crumb value = (Tree crumb value, [Crumb crumb value])
